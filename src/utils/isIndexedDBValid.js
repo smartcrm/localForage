@@ -21,6 +21,12 @@ function isIndexedDBValid() {
             typeof fetch === 'function' &&
             fetch.toString().indexOf('[native code') !== -1;
 
+        // this is a workaround to detect cordova-plugin-wkwebview-ionic-xhr
+        var isAppRunningInCordovaContainer =
+            Boolean(window.cordova) &&
+            Boolean(window.cordova.platformId) &&
+            window.cordova.platformId.toLowerCase() === 'ios';
+
         // Safari <10.1 does not meet our requirements for IDB support
         // (see: https://github.com/pouchdb/pouchdb/issues/5572).
         // Safari 10.1 shipped with fetch, we can use that to detect it.
@@ -28,7 +34,7 @@ function isIndexedDBValid() {
         // overrides; see:
         // https://github.com/localForage/localForage/issues/856
         return (
-            (!isSafari || hasFetch) &&
+            (!isSafari || hasFetch || isAppRunningInCordovaContainer) &&
             typeof indexedDB !== 'undefined' &&
             // some outdated implementations of IDB that appear on Samsung
             // and HTC Android devices <4.4 are missing IDBKeyRange
